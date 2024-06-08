@@ -14,10 +14,10 @@ userRouter.post("/register", async (req, res) => {
     }
     let hasspassword = await bcrypt.hash(password, 5);
     const newUser = new UserModel({ name, email, password: hasspassword });
-    res.status(200).json({ message: "User registered successfully.", newUser });
     await newUser.save();
+   return   res.status(200).json({ message: "User registered successfully.", newUser });
   } catch (error) {
-    res.status(404).send({
+   return  res.status(404).send({
       message: error.message,
       error,
     });
@@ -28,14 +28,14 @@ userRouter.post("/login", async (req, res) => {
     const { email, password } = req.body;
     let userData = await UserModel.findOne({ email });
     if (!userData) {
-      res.status(404).send({
+      return   res.status(404).send({
         messages: "User Doest Not Exit",
       });
-
+     
     }
    let isPasswordValid = await  bcrypt.compare(password, userData.password);
    if(!isPasswordValid){
-    res.status(404).send({message:"User Password Is Invalid"})
+    return  res.status(404).send({message:"User Password Is Invalid"})
    }
    const token = jwt.sign(
     { userId: userData._id,},
@@ -43,7 +43,7 @@ userRouter.post("/login", async (req, res) => {
     { expiresIn: "5h" }
   );
 
- res.status(200).send({
+  return  res.status(200).send({
     token, 
     message:"User Login Successfully",
     userData
